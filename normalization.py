@@ -1,11 +1,38 @@
 import pandas as pd
 import mysql.connector
+import re
 
 # Load the dataset
 data = input("Enter file name along with Path: ")
 
 df = pd.read_csv(data)
 df = df.convert_dtypes()
+
+def check_and_fix_1nf(df):
+    non_atomic_columns = []
+
+    # Detect non-atomic columns (e.g., string with commas)
+    for col in df.columns:
+        if df[col].apply(lambda x: isinstance(x, str) and ',' in x).any():
+            non_atomic_columns.append(col)
+
+    if not non_atomic_columns:
+        print("Checked for 1NF: Table is in First Normal Form")
+        return df
+
+    print("Table is not in 1NF. Fixing...")
+    print(f"Non-atomic columns found: {non_atomic_columns}")
+
+    # Normalize table: explode the non-atomic columns
+    for col in non_atomic_columns:
+        df[col] = df[col].apply(lambda x: x.split(',') if isinstance(x, str) else [x])
+        df = df.explode(col).reset_index(drop=True)
+
+    print("Transformed to 1NF")
+    return df
+
+df = check_and_fix_1nf(df)
+print(df)
 
 for col in df.columns:
     if df[col].dtype == 'Int64':

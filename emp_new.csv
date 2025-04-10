@@ -1,0 +1,5 @@
+EmployeeID,DepartmentID,EmployeeName,DepartmentName,ManagerName,Salary
+101,D01,Alice,HR,Sarah,50000
+102,D01,Bob,HR,Sarah,60000
+103,D02,Charlie,IT,John,70000
+104,D03,David,Sales,Lisa,75000

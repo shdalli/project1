@@ -188,6 +188,33 @@ print(table1_df)
 print("\nTable 2 (3NF):")
 print(table2_df)
 
+import itertools
+
+def find_candidate_keys(all_attributes, fds):
+    """
+    Finds all minimal candidate keys for a given set of attributes and functional dependencies.
+    """
+    candidate_keys = []
+    attr_list = list(all_attributes)
+
+    # Try all attribute combinations, from smallest to largest
+    for r in range(1, len(attr_list) + 1):
+        for subset in itertools.combinations(attr_list, r):
+            closure = compute_closure(subset, fds)
+            if closure == all_attributes:
+                # Check minimality
+                if not any(set(ck).issubset(set(subset)) for ck in candidate_keys):
+                    candidate_keys.append(subset)
+
+    return candidate_keys
+
+all_attributes = set(df.columns)
+candidate_keys = find_candidate_keys(all_attributes, fds)
+
+print("\nCandidate Keys:")
+for ck in candidate_keys:
+    print(", ".join(ck))
+
 #Preparing DDL Script 
 def pandas_dataframe_to_ddl(df, table_name):
     """

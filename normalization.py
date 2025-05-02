@@ -56,10 +56,10 @@ print(df.info())
 # Get table names and primary keys
 table_name1 = input("Enter 1st relation name: ")
 table_name2 = input("Enter 2nd relation name: ")
-
+'''
 table_name1 = 'Employee'
 table_name2 = 'Department'
-
+'''
 # Capture multiple primary keys for Table 1
 table1_pk = []
 print("Enter Primary Keys for Table 1 (Press Enter to stop):")
@@ -432,3 +432,76 @@ if __name__ == "__main__":
     insert_into_table(table1_df, table_name1, mysql_host, mysql_user, mysql_password, mysql_database)
 
     
+def interactive_query_interface(df):
+    while True:
+        print("\nInteractive Table Query Interface")
+        print("1. Insert Record")
+        print("2. Update Record")
+        print("3. Delete Record")
+        print("4. View Table")
+        print("5. Exit")
+
+        choice = input("Enter your choice (1-5): ").strip()
+
+        if choice == '1':
+            print("\nInsert New Record")
+            new_record = {}
+            for col in df.columns:
+                value = input(f"Enter value for '{col}': ")
+                new_record[col] = value
+            df = df.append(new_record, ignore_index=True)
+            print("Record inserted successfully.")
+
+        elif choice == '2':
+            print("\nUpdate Record")
+            key_col = input("Enter column name to identify the record (e.g., ID): ").strip()
+            key_val = input(f"Enter the value of {key_col} to find the record: ").strip()
+
+            if key_col not in df.columns:
+                print("Invalid column name.")
+                continue
+
+            mask = df[key_col].astype(str) == key_val
+            if not mask.any():
+                print("Record not found.")
+                continue
+
+            print("Record found:")
+            print(df[mask])
+
+            update_col = input("Enter the column to update: ").strip()
+            if update_col not in df.columns:
+                print("Invalid column name.")
+                continue
+
+            new_val = input(f"Enter new value for '{update_col}': ")
+            df.loc[mask, update_col] = new_val
+            print("Record updated successfully.")
+
+        elif choice == '3':
+            print("\nDelete Record")
+            key_col = input("Enter column name to identify the record: ").strip()
+            key_val = input(f"Enter value of {key_col} to delete record: ").strip()
+
+            mask = df[key_col].astype(str) == key_val
+            if not mask.any():
+                print("Record not found.")
+                continue
+
+            df = df[~mask]
+            print("Record deleted successfully.")
+
+        elif choice == '4':
+            print("\nCurrent Table:")
+            print(df)
+
+        elif choice == '5':
+            print("Exiting interactive interface.")
+            break
+        else:
+            print("Invalid choice. Please enter a number between 1 and 5.")
+    
+    return df
+
+# Call the interface on your main dataframe or a specific table
+df = interactive_query_interface(df)
